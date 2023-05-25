@@ -1,12 +1,15 @@
 import { Component } from "@angular/core";
 import { lastValueFrom } from "rxjs";
+import { StatusComada } from "src/app/api/dtos/enums/statusComanda.enum";
 import { ComandaDto } from "src/app/api/dtos/models/comanda.model";
 import { IngredienteDto } from "src/app/api/dtos/models/ingrediente.model";
 import { ItemIngredient } from "src/app/api/dtos/models/item-ingrediente.model";
 import { ItemDto } from "src/app/api/dtos/models/item.model";
+import { UserWithoutPassword } from "src/app/api/dtos/models/user-without-pasword.model";
 import { ComandaService } from "src/app/api/services/comanda.service";
 import { IngredienService } from "src/app/api/services/ingrediente.service";
 import { ItemService } from "src/app/api/services/item.service";
+import { UserService } from "src/app/api/services/user.service";
 
 
 @Component({
@@ -20,6 +23,7 @@ export class AdminPageComponent {
   public items: Array<ItemDto> | undefined;
   public ingrediente: Array<IngredienteDto>
   public comenzi: Array<ComandaDto> | undefined
+  public users: Array<UserWithoutPassword>
 
   public isAddFormVisible = false;
   public areProductsVisible = true;
@@ -43,13 +47,15 @@ export class AdminPageComponent {
   constructor(
     private itemService: ItemService,
     private ingredientService: IngredienService,
-    private comandaService: ComandaService
+    private comandaService: ComandaService,
+    private userService: UserService,
   ) { }
 
   ngOnInit(): void {
     this.importItems();
     this.importIngrediente();
     this.importOrders();
+    this.setUsers();
   }
 
   async importItems(): Promise<any> {
@@ -82,8 +88,18 @@ export class AdminPageComponent {
     });
   }
 
-  async onUsersClick(): Promise<void> {
+  setUsers(): void {
+    this.userService.getUsers()
+      .subscribe((result) => this.users = result)
   }
+
+  onUsersClick(): void {
+    this.areIngredientesVisible = false;
+    this.areOrdersVisible = false;
+    this.areProductsVisible = false;
+    this.areUsersVisible = true;
+  }
+
   onProductsClick(): void {
     this.areIngredientesVisible = false;
     this.areOrdersVisible = false;
@@ -167,5 +183,13 @@ export class AdminPageComponent {
       return '';
     }
     return this.ingrediente.filter((currentIngredient) => currentIngredient.ingrId == ingredientId)[0].ingrName ?? '';
+  }
+
+  public getTypeOfUser(user: UserWithoutPassword): string {
+    return user.type === 0 ? 'Client' : 'Admin';
+  }
+
+  public getStatus(status: number): string {
+    return StatusComada[status];
   }
 }

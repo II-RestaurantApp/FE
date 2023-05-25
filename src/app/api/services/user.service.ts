@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { UserDto } from "../dtos/models/user.model";
+import { UserWithoutPassword } from "../dtos/models/user-without-pasword.model";
 
 @Injectable()
 export class UserService {
@@ -17,7 +18,7 @@ export class UserService {
     return this.httpCient.post('https://localhost:7093/authorization', user);
   }
 
-  public getUsers(): Observable<Array<UserDto>> {
-    return this.httpCient.get<Array<UserDto>>('https://localhost:7093/user');
+  public getUsers(): Observable<Array<UserWithoutPassword>> {
+    return this.httpCient.get<Array<UserWithoutPassword>>('https://localhost:7093/user');
   }
 }
