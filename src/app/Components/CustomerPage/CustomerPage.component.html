@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Hello There</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#" (click)="onItemClick()">Menu</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">My Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">My account</a>
+      </li>
+    </ul>
+  </div>
+  <button class="btn btn-outline-success my-2 my-sm-0" type="button">Search</button>
+  <button class="btn btn-outline-success me-2"
+    style="color: rgb(228, 97, 174);background-color: white; border-color: black;" type="button">🛒
+  </button>
+</nav>
+<div>
+  <div class="d-flex flex-row justify-content-center flex-wrap m-2">
+    <div *ngFor="let item of items; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{item.denumire}}</h5>
+        <p class="card-text">Pret {{item.pret}}</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Gramaj {{item.gramaj}}</li>
+        <li class="list-group-item">Ingrediente:
+          <div *ngFor="let ingredient of item.ingrediente">
+            <span class="badge rounded-pill text-bg-warning">{{getIngredientNameById(ingredient.ingredientId)}}</span>
+          </div>
+        </li>
+      </ul>
+      <div class="card-body" style="color: rgb(228, 97, 174)">
+        <button class="btn btn-outline-secondary me-2" style="color: rgb(228, 97, 174)" (click)="addToCart(item)">🛒
+          Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--/div-->

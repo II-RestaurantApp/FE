@@ -30,3 +30,10 @@
 
   font-family: cursive;
 }
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}

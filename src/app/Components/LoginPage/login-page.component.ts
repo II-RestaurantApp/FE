@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { lastValueFrom } from "rxjs";
-import { UserDto } from "src/app/api/dtos/user.model";
+import { UserDto } from "src/app/api/dtos/models/user.model";
 import { UserService } from "src/app/api/services/user.service";
 
 @Component({
@@ -33,13 +33,18 @@ export class LoginComponent {
     if (response.success) {
       var type = response.sessionData.userType;
       if (type === 'CLIENT') {
-
-
         sessionStorage.setItem('Session Data', JSON.stringify(response.sessionData));
         window.location.assign('CustomerPage');
+      } else if (type === 'ADMIN') {
+        sessionStorage.setItem('Session Data', JSON.stringify(response.sessionData));
+        window.location.assign('AdminPage')
       }
-    }
+    } else this.displayNotification(response.error as string)
 
+  }
+
+  hideNotification(): void {
+    this.shouldDisplayNotification = false;
   }
 
 

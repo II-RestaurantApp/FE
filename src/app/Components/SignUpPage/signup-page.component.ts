@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { UserDto } from "src/app/api/dtos/user.model";
+import { UserDto } from "src/app/api/dtos/models/user.model";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/app/api/services/user.service";
 
@@ -20,6 +20,7 @@ export class SignUpComponent {
 
   public async signUp(): Promise<void> {
     if (!this.validateUserInput()) {
+      alert("Not okay credentials")
       return;
     }
     const response = await lastValueFrom(this.userService.addUser(this.user));
@@ -31,7 +32,12 @@ export class SignUpComponent {
   }
 
   private validateUserInput(): boolean {
-    return this.user.email != '' && this.user.password != '' && this.user.name != '' && this.user.type != null;
+    return this.user.email != '' && this.user.password != '' && this.user.name != '' && this.user.type != null &&
+      this.user.email.indexOf('@') != null && this.user.password.length > 8;
+  }
+
+  public setType(number: number) {
+    this.user.type = number;
   }
 
 }
