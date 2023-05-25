@@ -1,0 +1,140 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Eat Up Admin Page</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" (click)="onProductsClick()">Products</a>
+        </li>
+        <li>
+          <a class="nav-link" aria-current="page" (click)="onOrdersClick()">Orders</a>
+        </li>
+        <li>
+          <a class="nav-link" aria-current="page" (click)="onIngredienteClick()">Ingrediente</a>
+        </li>
+        <li>
+          <a class="nav-link" aria-current="page" (click)="onUsersClick()">Users</a>
+        </li>
+      </ul>
+      <form class="d-flex">
+        <a href="" class="btn btn-outline-success me-2" type="submit">Logout</a>
+      </form>
+    </div>
+  </div>
+</nav>
+<div *ngIf="areProductsVisible">
+  <a class="btn btn-primary m-4" (click)="onAddProductClick()">Add New Item</a>
+  <div *ngIf="isAddFormDisplayed()">
+    <form>
+      <div class="text-center form-group">
+        <label class="d-block">Choose the Product image</label>
+        <input id="inputType" type="text" class="form-control w-25 mx-auto my-2" placeholder="Denumire" name="denumire"
+          [(ngModel)]="item.denumire">
+        <input id="inputSkinType" type="text" class="form-control w-25 mx-auto my-2" placeholder="Gramaj" name="gramaj"
+          [(ngModel)]="item.gramaj">
+        <input id="inputPrice" type="number" class="form-control w-25 mx-auto my-2" placeholder="Pret" name="pret"
+          [(ngModel)]="item.pret">
+        <div>
+          <select multiple class="w-25 mb-2" id="exampleFormControlSelect2">
+            <option *ngFor="let ingredient of ingrediente; let index = index"
+              (click)="selecOrUnselectIngredient(index)">{{ingredient.ingrName}}
+            </option>
+          </select>
+        </div>
+        <a class="btn btn-primary m-4" (click)="AddItem()">Add</a>
+      </div>
+    </form>
+  </div>
+  <h3 class="m-2">Products</h3>
+  <div class="d-flex flex-row justify-content-center flex-wrap m-2">
+    <div *ngFor="let item of items; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{item.denumire}}</h5>
+        <p class="card-text">Pret {{item.pret}}</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Gramaj {{item.gramaj}}</li>
+        <li class="list-group-item">Ingrediente:
+          <span class="m-1" *ngFor="let ingredient of item.ingrediente">
+            <span class="badge rounded-pill text-bg-warning">{{getIngredientNameById(ingredient.ingredientId)}}</span>
+          </span>
+        </li>
+      </ul>
+      <div class="card-body">
+        <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
+        <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
+      </div>
+      <div *ngIf="isEditEnabled[indexOfelement]">
+        <h5 class="card-title">ID:{{item.id}}</h5>
+        <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
+          [(ngModel)]="item.denumire">
+        <input id="inputEditSkinType" type="text" class="form-control mx-auto" placeholder="Gramaj"
+          [(ngModel)]="item.gramaj">
+        <input id="inputEditPrice" type="number" class="form-control mx-auto" placeholder="Pret"
+          [(ngModel)]="item.pret">
+        <input id="inputEditName" type="text" class="form-control mx-auto" placeholder="Ingrediente"
+          [(ngModel)]="item.ingrediente">
+        <div class="card-body">
+          <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-flex flex-row justify-content-center flex-wrap m-2" *ngIf="areIngredientesVisible">
+  <a class="btn btn-primary m-4" (click)="onAddIngredientClick()">Add New Ingredient</a>
+  <div *ngIf="isAddFormDisplayed()">
+    <form>
+      <div class="text-center form-group">
+        <input id="inputType" type="text" class="form-control w-25 mx-auto" placeholder="Nume"
+          [(ngModel)]="ingredient.ingrName">
+        <a class="btn btn-primary m-4" (click)="AddItem()">Add</a>
+      </div>
+    </form>
+  </div>
+  <div *ngFor="let ingredient of ingrediente; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
+    <!--div *ngIf="!isEditEnabled[indexOfelement]"-->
+    <div class="card-body">
+      <h5 class="card-title">{{ingredient.ingrName}}</h5>
+    </div>
+    <div class="card-body">
+      <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
+      <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
+    </div>
+    <div *ngIf="isEditEnabled[indexOfelement]">
+      <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
+        [(ngModel)]="ingredient.ingrName">
+      <div class="card-body">
+        <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-flex flex-row justify-content-center flex-wrap m-2" *ngIf="areOrdersVisible">
+  <div *ngFor="let comanda of comenzi; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
+    <!--div *ngIf="!isEditEnabled[indexOfelement]"-->
+    <div class="card-body">
+      <h5 class="card-title">Order #{{comanda.comId}}</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">User Name{{comanda.user}}</li>
+      <li class="list-group-item">UserId {{comanda.userId}}</li>
+      <li class="list-group-item">Total {{comanda.total}}</li>
+    </ul>
+    <div class="card-body">
+      <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
+      <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
+    </div>
+    <div *ngIf="isEditEnabled[indexOfelement]">
+      <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
+        [(ngModel)]="comanda.status">
+      <div class="card-body">
+        <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
+      </div>
+    </div>
+  </div>
+</div>

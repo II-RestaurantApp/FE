@@ -1,0 +1,27 @@
+<form>
+  <div class="center-screen">
+    <div class="card">
+      <div class="card-body">
+        <div class="mb-3 row d-grid gap-2">
+          <input name="nume" type="text" class=form-control placeholder="Nume Prenume" [(ngModel)]="user.name">
+          <input name="email" type="email" class="form-control" placeholder="Email" [(ngModel)]="user.email">
+          <input name="password" type="password" class="form-control" placeholder="Password"
+            [(ngModel)]="user.password">
+
+
+          <div class="btn-group p-0" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off"
+              (click)="setType(1)">
+            <label class="btn btn-outline-primary" for="btnradio1">Admin</label>
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked
+              (click)="setType(0)">
+            <label class="btn btn-outline-primary" for="btnradio2">Client</label>
+          </div>
+          <div class="d-flex justify-content-between p-0">
+          </div>
+          <button type="button" class="btn btn-primary" (click)="signUp()">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

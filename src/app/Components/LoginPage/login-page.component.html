@@ -1,0 +1,26 @@
+<form>
+  <div *ngIf="shouldDisplayNotification" class="alert alert-danger">
+    {{ notificationMessage }}
+    <div>
+      <button class="close" (click)="hideNotification()"></button>
+    </div>
+  </div>
+  <h1 class="title">Eat up !</h1>
+  <div class="center-screen">
+    <div class="card">
+      <div class="card-body">
+        <div class="mb-3 row d-grid gap-2">
+          <label for="exampleInputEmail1" class="label">Email address</label>
+          <input name="email" type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email"
+            [(ngModel)]="user.email">
+          <small id="emailHelp" class="form-text">We'll never share your email with anyone else.</small>
+          <label for="exampleInputPassword1" class="label">Password</label>
+          <input type="password" name="password" class="form-control" id="exampleInputPassword1"
+            [(ngModel)]="user.password" placeholder="Password">
+          <button type="button" class="btn btn-primary" (click)="login()">Log In</button>
+          <a class="btn btn-primary" href="signup" role="button">Join Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
