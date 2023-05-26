@@ -5,5 +5,5 @@ export interface ItemDto {
   denumire: string,
   gramaj: number,
   pret: number,
-  ingrediente?: Array<IngredienteDto>
+  ingrediente?: Array<IngredienteDto> | Array<any>,
 }

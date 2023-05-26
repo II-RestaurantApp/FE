@@ -20,7 +20,7 @@ import { UserService } from "src/app/api/services/user.service";
 
 export class AdminPageComponent {
 
-  public items: Array<ItemDto> | undefined;
+  public items: Array<ItemDto>;
   public ingrediente: Array<IngredienteDto>
   public comenzi: Array<ComandaDto> | undefined
   public users: Array<UserWithoutPassword>
@@ -31,6 +31,8 @@ export class AdminPageComponent {
   public areUsersVisible = false;
   public areOrdersVisible = false;
   public isEditEnabled = Array<boolean>();
+  public editModalActive = false;
+  public dropdownActive = false;
 
   public item: ItemDto = {
     denumire: "",
@@ -122,22 +124,24 @@ export class AdminPageComponent {
   }
 
   async onEditClick(index: number) {
-    this.isEditEnabled[index] = !this.isEditEnabled[index];
+    this.item = { ...this.items[index] };
+    this.item.ingrediente = [];
+    this.items[index].ingrediente?.forEach((ingredient) => {
+      const ingredientToAdd = this.ingrediente.find((currentIngredient) => currentIngredient.ingrId == ingredient.ingredientId);
+      if (ingredientToAdd) {
+        this.item.ingrediente?.push(ingredientToAdd);
+      }
+    });
+    console.log(this.item);
+    this.editModalActive = true;
+
+    // this.isEditEnabled[index] = !this.isEditEnabled[index];
   }
 
-  async editProduct(item: ItemDto, index: number): Promise<void> {
-    if (item.denumire != '') {
-      this.item.denumire = item.denumire;
-    }
-    if (item.pret != null) {
-      this.item.pret = item.pret;
-    }
-    if (item.gramaj != null) {
-      this.item.gramaj = item.gramaj;
-    }
-
-    const response = await lastValueFrom(this.itemService.updateItem(this.item, item.id as number))
-
+  async editProduct(id: number | undefined): Promise<void> {
+    const response = await lastValueFrom(this.itemService.updateItem(this.item, id as number))
+    this.importItems();
+    this.closeModal();
   }
 
   isAddFormDisplayed(): boolean {
@@ -178,11 +182,19 @@ export class AdminPageComponent {
     }
   }
 
+  selecOrUnselectIngredientFromItem(index: number, item: ItemDto): void {
+    if (item.ingrediente?.some((currentIngredient) => currentIngredient.ingrId == this.ingrediente[index].ingrId)) {
+      item.ingrediente = item.ingrediente.filter((currentIngredient) => currentIngredient.ingrId != this.ingrediente[index].ingrId);
+    } else {
+      item.ingrediente?.push(this.ingrediente[index]);
+    }
+  }
+
   getIngredientNameById(ingredientId?: number): string {
     if (!this.ingrediente) {
       return '';
     }
-    return this.ingrediente.filter((currentIngredient) => currentIngredient.ingrId == ingredientId)[0].ingrName ?? '';
+    return this.ingrediente.filter((currentIngredient) => currentIngredient.ingrId == ingredientId)[0]?.ingrName ?? '';
   }
 
   public getTypeOfUser(user: UserWithoutPassword): string {
@@ -191,5 +203,31 @@ export class AdminPageComponent {
 
   public getStatus(status: number): string {
     return StatusComada[status];
+  }
+
+  public closeModal(): void {
+    this.editModalActive = false;
+    this.item = {
+      denumire: "",
+      pret: 0,
+      gramaj: 0,
+      ingrediente: new Array<IngredienteDto>(),
+    } as ItemDto;
+  }
+
+  public triggerDropdown(): void {
+    this.dropdownActive = !this.dropdownActive;
+  }
+
+  public selectIngredient(id: number | undefined): void {
+    if (this.item.ingrediente?.some((ingredient) => ingredient.ingrId === id)) {
+      return;
+    }
+
+    this.item.ingrediente?.push(this.ingrediente.find((ingredient) => ingredient.ingrId === id) as IngredienteDto)
+  }
+
+  public removeIngredient(id: number | undefined): void {
+    this.item.ingrediente = this.item.ingrediente?.filter((ingredient) => ingredient.ingrId != id);
   }
 }
