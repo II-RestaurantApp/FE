@@ -72,20 +72,6 @@
         <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
         <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
       </div>
-      <div *ngIf="isEditEnabled[indexOfelement]">
-        <h5 class="card-title">ID:{{item.id}}</h5>
-        <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
-          [(ngModel)]="item.denumire">
-        <input id="inputEditSkinType" type="text" class="form-control mx-auto" placeholder="Gramaj"
-          [(ngModel)]="item.gramaj">
-        <input id="inputEditPrice" type="number" class="form-control mx-auto" placeholder="Pret"
-          [(ngModel)]="item.pret">
-        <input id="inputEditName" type="text" class="form-control mx-auto" placeholder="Ingrediente"
-          [(ngModel)]="item.ingrediente">
-        <div class="card-body">
-          <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -114,7 +100,7 @@
         <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
           [(ngModel)]="ingredient.ingrName">
         <div class="card-body">
-          <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
+          <a class="btn btn-outline-secondary me-2" (click)="editProduct(item.id)">✔️</a>
         </div>
       </div>
     </div>
@@ -142,7 +128,7 @@
       <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
         [(ngModel)]="comanda.status">
       <div class="card-body">
-        <a class="btn btn-outline-secondary me-2" (click)="editProduct(item, indexOfelement)">✔️</a>
+        <a class="btn btn-outline-secondary me-2" (click)="editProduct(item.id)">✔️</a>
       </div>
     </div>
   </div>
@@ -166,4 +152,46 @@
       </tr>
     </tbody>
   </table>
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': editModalActive}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit {{item.denumire}}</p>
+      <button class="delete" aria-label="close" (click)="closeModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <input class="input my-1" type="text" placeholder="Denumire" [(ngModel)]="item.denumire">
+      <input class="input my-1" type="number" placeholder="Gramaj" [(ngModel)]="item.gramaj">
+      <input class="input my-1" type="number" placeholder="Pret" [(ngModel)]="item.pret">
+      <div class="is-flex">
+        <span class="tag is-warning m-1" *ngFor="let ingredient of item.ingrediente">
+          {{getIngredientNameById(ingredient.ingrId)}}
+          <button class="delete is-small" (click)="removeIngredient(ingredient.ingrId)"></button>
+        </span>
+      </div>
+      <div class="dropdown my-3" [ngClass]="{'is-active': dropdownActive}">
+        <div class="dropdown-trigger">
+          <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3" (click)="triggerDropdown()">
+            <span>Ingrediente</span>
+            <span class="icon is-small">
+              <i class="fas fa-angle-down" aria-hidden="true"></i>
+            </span>
+          </button>
+        </div>
+        <div class="dropdown-menu p-0" id="dropdown-menu3" role="menu">
+          <div class="dropdown-content">
+            <a *ngFor="let ingredient of ingrediente" class="dropdown-item"
+              (click)="selectIngredient(ingredient.ingrId)">
+              {{ingredient.ingrName}}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot is-flex is-justify-content-end">
+      <button class="button is-success" (click)="editProduct(item.id)">Save changes</button>
+    </footer>
+  </div>
 </div>
