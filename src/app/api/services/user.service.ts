@@ -19,6 +19,30 @@ export class UserService {
   }
 
   public getUsers(): Observable<Array<UserWithoutPassword>> {
-    return this.httpCient.get<Array<UserWithoutPassword>>('https://localhost:7093/user');
+    const sessionData = JSON.parse(sessionStorage.getItem('Session Data') as string);
+    return this.httpCient.get<Array<UserWithoutPassword>>('https://localhost:7093/user',
+      {
+        headers: {
+          'authorization': `Bearer ${sessionData.bearerToken}`
+        }
+      });
+  }
+
+  public getUser(id: number): Observable<UserDto> {
+    const sessionData = JSON.parse(sessionStorage.getItem('Session Data') as string);
+    return this.httpCient.get<UserDto>(`https://localhost:7093/user/${id}`, {
+      headers: {
+        'authorization': `Bearer ${sessionData.bearerToken}`
+      }
+    });
+  }
+
+  public updateUser(id: number, user: UserDto): Observable<any> {
+    const sessionData = JSON.parse(sessionStorage.getItem('Session Data') as string);
+    return this.httpCient.put<any>(`https://localhost:7093/user?id=${id}`, user, {
+      headers: {
+        'authorization': `Bearer ${sessionData.bearerToken}`
+      }
+    });
   }
 }

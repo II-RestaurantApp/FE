@@ -70,7 +70,7 @@
       </ul>
       <div class="card-body">
         <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
-        <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
+        <a class="btn btn-outline-danger" (click)="deleteProduct(item.id)">🗑️</a>
       </div>
     </div>
   </div>
@@ -80,9 +80,9 @@
   <div *ngIf="isAddFormDisplayed()">
     <form>
       <div class="text-center form-group">
-        <input id="inputType" type="text" class="form-control w-25 mx-auto" placeholder="Nume"
-          [(ngModel)]="ingredient.ingrName">
-        <a class="btn btn-primary m-4" (click)="AddItem()">Add</a>
+        <input id="inputType" name="ingredientName" type="text" class="form-control w-25 mx-auto" placeholder="Nume"
+          [(ngModel)]="ingredientToAdd.ingrName">
+        <a class="btn btn-primary m-4" (click)="AddIngredient()">Add</a>
       </div>
     </form>
   </div>
@@ -92,8 +92,8 @@
       <div class="card-body d-flex justify-content-between align-items-center">
         <h5 class="card-title">{{ingredient.ingrName}}</h5>
         <div>
-          <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
-          <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
+          <a class="btn btn-outline-secondary me-2" (click)="onIngredientClick(ingredient.ingrId)">✏️</a>
+          <a class="btn btn-outline-danger" (click)="deleteIngredient(ingredient.ingrId)">🗑️</a>
         </div>
       </div>
       <div *ngIf="isEditEnabled[indexOfelement]">
@@ -107,29 +107,20 @@
   </div>
 </div>
 <div class="d-flex flex-row justify-content-center flex-wrap m-2" *ngIf="areOrdersVisible">
-  <div *ngFor="let comanda of comenzi; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
-    <!--div *ngIf="!isEditEnabled[indexOfelement]"-->
+  <div *ngFor="let comanda of comenzi; index as indexOfelement;" class="card m-2" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Order #{{comanda.comId}}</h5>
     </div>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item">User Name: {{users[comanda.userId].name}}</li>
-      <li class="list-group-item">User Email: {{users[comanda.userId].email}}</li>
+      <li class="list-group-item">User Name: {{getUserById(comanda.userId).name}}</li>
+      <li class="list-group-item">User Email: {{getUserById(comanda.userId).email}}</li>
       <li class="list-group-item">Total {{comanda.total}}</li>
       <li class="list-group-item">
         <span class="badge rounded-pill text-bg-warning">{{getStatus(comanda.status)}}</span>
       </li>
     </ul>
     <div class="card-body">
-      <a class="btn btn-outline-secondary me-2" (click)="onEditClick(indexOfelement)">✏️</a>
-      <a class="btn btn-outline-danger" (click)="deleteProduct(item)">🗑️</a>
-    </div>
-    <div *ngIf="isEditEnabled[indexOfelement]">
-      <input id="inputEditType" type="text" class="form-control mx-auto" placeholder="Denumire"
-        [(ngModel)]="comanda.status">
-      <div class="card-body">
-        <a class="btn btn-outline-secondary me-2" (click)="editProduct(item.id)">✔️</a>
-      </div>
+      <a class="btn btn-outline-secondary me-2" (click)="onEditOrderClick(comanda)">✏️</a>
     </div>
   </div>
 </div>
@@ -192,6 +183,64 @@
     </section>
     <footer class="modal-card-foot is-flex is-justify-content-end">
       <button class="button is-success" (click)="editProduct(item.id)">Save changes</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': editIngredientModalActive}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit {{ingredient.ingrName}}</p>
+      <button class="delete" aria-label="close" (click)="closeIngredientModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <input class="input my-1" type="text" placeholder="Denumire" [(ngModel)]="ingredient.ingrName">
+    </section>
+    <footer class="modal-card-foot is-flex is-justify-content-end">
+      <button class="button is-success" (click)="updateIngredient(ingredient.ingrId)">Save changes</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': displayOrderEdit}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit {{ingredient.ingrName}}</p>
+      <button class="delete" aria-label="close" (click)="closeEditOrderModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="field has-addons">
+        <p class="control">
+          <button class="button" (click)="selectStatus(0)">
+            <span>IN_ASTEPTARE</span>
+          </button>
+        </p>
+        <p class="control">
+          <button class="button" (click)="selectStatus(1)">
+            <span>IN_PROCESARE</span>
+          </button>
+        </p>
+        <p class="control">
+          <button class="button" (click)="selectStatus(2)">
+            <span>GATA_DE_LIVRARE</span>
+          </button>
+        </p>
+        <p class="control">
+          <button class="button" (click)="selectStatus(3)">
+            <span>IN_CURS_DE_LIVRARE</span>
+          </button>
+        </p>
+        <p class="control">
+          <button class="button" (click)="selectStatus(4)">
+            <span>LIVRATA</span>
+          </button>
+        </p>
+      </div>
+    </section>
+    <footer class="modal-card-foot is-flex is-justify-content-end">
+      <button class="button is-success" (click)="updateStatusComanda(order)">Save changes</button>
     </footer>
   </div>
 </div>

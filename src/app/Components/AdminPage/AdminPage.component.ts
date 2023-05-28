@@ -3,9 +3,10 @@ import { lastValueFrom } from "rxjs";
 import { StatusComada } from "src/app/api/dtos/enums/statusComanda.enum";
 import { ComandaDto } from "src/app/api/dtos/models/comanda.model";
 import { IngredienteDto } from "src/app/api/dtos/models/ingrediente.model";
-import { ItemIngredient } from "src/app/api/dtos/models/item-ingrediente.model";
 import { ItemDto } from "src/app/api/dtos/models/item.model";
+import { Order } from "src/app/api/dtos/models/order.model";
 import { UserWithoutPassword } from "src/app/api/dtos/models/user-without-pasword.model";
+import { UserDto } from "src/app/api/dtos/models/user.model";
 import { ComandaService } from "src/app/api/services/comanda.service";
 import { IngredienService } from "src/app/api/services/ingrediente.service";
 import { ItemService } from "src/app/api/services/item.service";
@@ -32,7 +33,9 @@ export class AdminPageComponent {
   public areOrdersVisible = false;
   public isEditEnabled = Array<boolean>();
   public editModalActive = false;
+  public editIngredientModalActive = false;
   public dropdownActive = false;
+  public displayOrderEdit = false;
 
   public item: ItemDto = {
     denumire: "",
@@ -43,8 +46,14 @@ export class AdminPageComponent {
 
   public ingredient: IngredienteDto = {
     ingrName: ""
-
   }
+
+  public ingredientToAdd: IngredienteDto = {
+    ingrName: ""
+  }
+
+  public order: Order;
+  public status: StatusComada;
 
   constructor(
     private itemService: ItemService,
@@ -81,13 +90,7 @@ export class AdminPageComponent {
   }
 
   async importOrders(): Promise<any> {
-    this.comandaService.getComanda().subscribe((Comenzi: Array<ComandaDto>) => {
-      this.comenzi = Comenzi;
-      this.isEditEnabled = Array<boolean>();
-      this.comenzi.forEach(() => {
-        this.isEditEnabled.push(false);
-      });
-    });
+    this.comenzi = await lastValueFrom(this.comandaService.getComanda());
   }
 
   setUsers(): void {
@@ -132,7 +135,6 @@ export class AdminPageComponent {
         this.item.ingrediente?.push(ingredientToAdd);
       }
     });
-    console.log(this.item);
     this.editModalActive = true;
 
     // this.isEditEnabled[index] = !this.isEditEnabled[index];
@@ -157,7 +159,6 @@ export class AdminPageComponent {
       gramaj: 0,
       ingrediente: new Array<IngredienteDto>(),
     }
-
     this.onAddProductClick();
   }
 
@@ -169,8 +170,9 @@ export class AdminPageComponent {
     this.isAddFormVisible = !this.isAddFormVisible;
   }
 
-  async deleteProduct(item: ItemDto) {
-
+  async deleteProduct(id: number | undefined): Promise<void> {
+    await lastValueFrom(this.itemService.deleteItem(id as number));
+    this.importItems();
   }
 
 
@@ -229,5 +231,68 @@ export class AdminPageComponent {
 
   public removeIngredient(id: number | undefined): void {
     this.item.ingrediente = this.item.ingrediente?.filter((ingredient) => ingredient.ingrId != id);
+  }
+
+  public closeIngredientModal(): void {
+    this.editIngredientModalActive = false;
+  }
+
+  public async updateIngredient(id: number | undefined): Promise<void> {
+    await lastValueFrom(this.ingredientService.updateIngredient(id as number, this.ingredient));
+    this.importIngrediente();
+    this.ingredient = {
+      ingrName: ''
+    }
+    this.closeIngredientModal();
+  }
+
+  public onIngredientClick(id: number | undefined): void {
+    this.ingredient = this.ingrediente.find(ingredient => ingredient.ingrId == id) as IngredienteDto;
+
+    if (!this.ingredient) {
+      return;
+    }
+
+    this.editIngredientModalActive = true;
+  }
+
+  public async deleteIngredient(id: number | undefined): Promise<void> {
+    await lastValueFrom(this.ingredientService.deleteIngredient(id as number));
+    this.importIngrediente();
+    this.ingredient = {
+      ingrName: ''
+    }
+    this.closeIngredientModal();
+  }
+
+  public async AddIngredient(): Promise<void> {
+    await lastValueFrom(this.ingredientService.addIngredient(this.ingredientToAdd));
+    this.importIngrediente();
+    this.ingredientToAdd.ingrName = '';
+    this.isAddFormVisible = false;
+  }
+
+  getUserById(id: number): UserWithoutPassword {
+    return this.users.find(user => user.userId == id) as UserWithoutPassword;
+  }
+
+  async updateStatusComanda(comanda: Order): Promise<void> {
+    await lastValueFrom(this.comandaService.updateStatusComanda(comanda.comId, this.status));
+    await this.importOrders();
+    this.closeEditOrderModal();
+  }
+
+  onEditOrderClick(order: Order): void {
+    this.displayOrderEdit = true;
+    this.order = order;
+  }
+
+  async closeEditOrderModal(): Promise<void> {
+    this.displayOrderEdit = false;
+    await this.importOrders();
+  }
+
+  selectStatus(status: number): void {
+    this.status = status;
   }
 }

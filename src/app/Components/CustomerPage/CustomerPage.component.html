@@ -7,24 +7,24 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#" (click)="onItemClick()">Menu</a>
+        <a class="nav-link" (click)="onItemClick()">Menu</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">My Orders</a>
+        <a class="nav-link" (click)="onOrdersClick()">My Orders</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">My account</a>
+        <a class="nav-link" (click)="onMyAccountClick()">My account</a>
       </li>
     </ul>
   </div>
-  <button class="btn btn-outline-success my-2 my-sm-0" type="button">Search</button>
-  <button class="btn btn-outline-success me-2"
-    style="color: rgb(228, 97, 174);background-color: white; border-color: black;" type="button">🛒
+  <button class="btn btn-warning me-2" type="button" (click)="displayCart()">
+    🛒 <span class="badge badge-pill badge-info">{{cartSize}}</span>
   </button>
 </nav>
-<div>
+
+<div *ngIf="areProductsVisible">
   <div class="d-flex flex-row justify-content-center flex-wrap m-2">
-    <div *ngFor="let item of items; index as indexOfelement;" class="card mt-3" style="width: 18rem;">
+    <div *ngFor="let item of items; index as indexOfelement;" class="card m-2" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title">{{item.denumire}}</h5>
         <p class="card-text">Pret {{item.pret}}</p>
@@ -32,8 +32,9 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item">Gramaj {{item.gramaj}}</li>
         <li class="list-group-item">Ingrediente:
-          <div *ngFor="let ingredient of item.ingrediente">
-            <span class="badge rounded-pill text-bg-warning">{{getIngredientNameById(ingredient.ingredientId)}}</span>
+          <div class="d-flex">
+            <span *ngFor="let ingredient of item.ingrediente"
+              class="badge rounded-pill text-bg-warning m-1">{{getIngredientNameById(ingredient.ingredientId)}}</span>
           </div>
         </li>
       </ul>
@@ -44,4 +45,147 @@
     </div>
   </div>
 </div>
-<!--/div-->
+
+<div *ngIf="isCartVisible">
+  <div class="card m-5">
+    <div class="card-body">
+      <div *ngFor="let item of cart; let index = index">
+        <div class="card mx-3 my-1">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <h4>
+              <button class="button is-danger is-small is-rounded" (click)="decreaseQuantity(index)">-</button>
+              {{item.product.denumire}}
+            </h4>
+            <span>
+              {{item.quantity}} x {{item.product.pret | currency:'RON'}}
+              <button class="button is-success is-small is-rounded" (click)="increaseQuantity(index)">+</button>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between m-5">
+        <h4>Total</h4>
+        <h4>{{getCartTotal() | currency:'RON'}}</h4>
+      </div>
+      <div class="m-3 d-flex justify-content-end">
+        <button *ngIf="getCartTotal() > 0" class="button is-success" (click)="finishOrder()">Finish Order</button>
+        <button *ngIf="getCartTotal() == 0" class="button is-success" disabled>Finish Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-row justify-content-center flex-wrap m-2" *ngIf="areOrdersVisible">
+  <div *ngFor="let comanda of orders; index as indexOfelement;" class="card m-2" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">Order #{{comanda.comId}}</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">User Name: {{user.name}}</li>
+      <li class="list-group-item">User Email: {{user.email}}</li>
+      <li class="list-group-item">Total {{comanda.total | currency:'RON'}}</li>
+      <li class="list-group-item">
+        <span class="badge rounded-pill text-bg-warning">{{getStatus(comanda.status)}}</span>
+      </li>
+      <li class="list-group-item">
+        <span *ngFor="let item of comanda.items"
+          class="badge rounded-pill text-bg-success m-1">{{getItemOrderInfo(item)}}</span>
+      </li>
+    </ul>
+    <div class="card-body">
+      <a class="btn btn-outline-secondary me-2" (click)="onEditClick(comanda)">✏️</a>
+      <a class="btn btn-outline-danger" (click)="deleteOrder(comanda)">❌</a>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="displayOrderNotification" class="notification is-success card notification-body">
+  <button class="delete" (click)="dismissOrderNotification()"></button>
+  Comanda Dumneavoastra a fost plasata cu success!
+</div>
+
+<div *ngIf="myAccountVisible">
+  <div class="card m-5">
+    <div class="card-body">
+      <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="name" [(ngModel)]="user.name">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Email</label>
+        <div class="control has-icons-left">
+          <input class="input" type="email" placeholder="Email" [(ngModel)]="user.email">
+          <span class="icon is-small is-left">
+            <i class="fas fa-envelope"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Password</label>
+        <div class="control has-icons-left">
+          <input class="input" type="text" placeholder="Password" [(ngModel)]="user.password">
+          <span class="icon is-small is-left">
+            <i class="fas fa-regular fa-lock"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="is-flex is-justify-content-end mt-5">
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link" (click)="updateUser()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notification is-danger is-light" *ngIf="displayBadStatusOrderNotification">
+  <button class="delete" (click)="closeBadStatusNotification()"></button>
+  Ne cerem scuze, status-ul comenzii dumneavoastra nu permite anularea comenzii!
+</div>
+
+<div *ngIf="displayOrderEdit" class="modal" [ngClass]="{ 'is-active': displayOrderEdit}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit Order</p>
+      <button class="delete" aria-label="close" (click)="closeEditOrderModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="card mx-3 my-1">
+        <div class="card-body">
+          <div *ngFor="let item of getItemsFromOrder(order); let index = index">
+            <div class="card mx-3 my-1">
+              <div class="card-body d-flex justify-content-between align-items-center">
+                <h4>
+                  <button class="button is-danger is-small is-rounded"
+                    (click)="decreaseQuantityForOrderEdit(index)">-</button>
+                  {{item.denumire}}
+                </h4>
+                <span>
+                  {{getItemQuantity(index)}} x {{item.pret | currency:'RON'}}
+                  <button class="button is-success is-small is-rounded"
+                    (click)="increaseQuantityForOrderEdit(index)">+</button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot is-flex is-justify-content-end">
+      <button class="button is-success" (click)="updateOrder()">Save changes</button>
+    </footer>
+  </div>
+</div>
+
+<div *ngIf="displayUserUpdatedNotification" class="notification is-success card user-notification-body">
+  <button class="delete" (click)="dismissUserUpdateNotification()"></button>
+  User-ul a fost updatat cu success!
+</div>
