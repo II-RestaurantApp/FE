@@ -20,6 +20,9 @@
   <button class="btn btn-warning me-2" type="button" (click)="displayCart()">
     🛒 <span class="badge badge-pill badge-info">{{cartSize}}</span>
   </button>
+  <form class="d-flex">
+    <a href="" class="btn btn-outline-success me-2" type="submit">Logout</a>
+  </form>
 </nav>
 
 <div *ngIf="areProductsVisible">
@@ -32,10 +35,9 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item">Gramaj {{item.gramaj}}</li>
         <li class="list-group-item">Ingrediente:
-          <div class="d-flex">
-            <span *ngFor="let ingredient of item.ingrediente"
-              class="badge rounded-pill text-bg-warning m-1">{{getIngredientNameById(ingredient.ingredientId)}}</span>
-          </div>
+          <span class="m-1" *ngFor="let ingredient of item.ingrediente">
+            <span class="badge rounded-pill text-bg-warning">{{getIngredientNameById(ingredient.ingredientId)}}</span>
+          </span>
         </li>
       </ul>
       <div class="card-body" style="color: rgb(228, 97, 174)">
@@ -92,7 +94,7 @@
           class="badge rounded-pill text-bg-success m-1">{{getItemOrderInfo(item)}}</span>
       </li>
     </ul>
-    <div class="card-body">
+    <div class="card-body" *ngIf="comanda.status == 0">
       <a class="btn btn-outline-secondary me-2" (click)="onEditClick(comanda)">✏️</a>
       <a class="btn btn-outline-danger" (click)="deleteOrder(comanda)">❌</a>
     </div>
